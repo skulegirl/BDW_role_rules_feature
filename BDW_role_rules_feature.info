@@ -1,0 +1,22 @@
+name = BDW_role_rules_feature
+core = 7.x
+package = Features
+dependencies[] = entity
+dependencies[] = flag
+dependencies[] = php
+dependencies[] = rules
+dependencies[] = uc_order
+dependencies[] = uc_roles
+features[features_api][] = api:2
+features[rules_config][] = rules_add_full_member_role_to_user_if_bda
+features[rules_config][] = rules_add_membership_expired_role_to_user
+features[rules_config][] = rules_add_membership_expiring_flag_to_user
+features[rules_config][] = rules_add_purchased_membership_flag_and_role_to_user
+features[rules_config][] = rules_remove_expiring_membership_flag_from_user
+features[rules_config][] = rules_remove_full_member_role_when_bda_req_role_is_revoked
+features[rules_config][] = rules_remove_membership_expired_role_from_user
+features[rules_config][] = rules_remove_membership_expiring_flag_from_user
+features[rules_config][] = rules_transfer_bda_req_membership_to_full_member_role
+features[rules_config][] = rules_transfer_full_membership_to_bda_req_role
+
+version = "7.x-1.0"

@@ -1,0 +1,117 @@
+<?php
+
+// Implementation of hook_mail_alter() 
+function BDW_role_rules_feature_mail_alter(&$message) {
+  // if this is a user registration email, customize it based on the role 
+  // (i.e. member vs. affiliate)
+  if ($message['id'] == 'logintoboggan_register_no_approval_required')
+  {
+    $account = $message['params']['account'];
+
+    if (!in_array('affiliate',$account->roles))
+    {
+      return;
+    }
+    $message['body'][0] = t('!username,', array('!username' => $account->name));
+
+    $message['body'][] = t('Thank you for registering as an affiliate at Boondockers Welcome. You may now log in to !login_uri using the following username and password:', 
+      array('!login_uri' => url('user', array('absolute' => TRUE, 'language' => $message['language']))));
+
+    $message['body'][] = t('username: !username<br>npassword: !password',
+      array('!username' => $account->name,
+            '!password' => $account->password));
+
+    $message['body'][] = t('You may also log in by clicking on this link or copying and pasting it in your browser:');
+    $timestamp = time();
+    $message['body'][] = t('!login_url',
+      array('!login_url' => url("user/reset/$account->uid/$timestamp/". md5($timestamp . $account->pass . $account->login), array('absolute' => TRUE))));
+
+    $message['body'][] = t('This is a one-time login, so it can be used only once.<p>After logging in, you will be redirected to the "Account Info" page so you can change your password to one of your choosing.');
+    $message['body'][] = t('Once logged in, you can find images and links to share with your personalized affiliate code under the "Affiliate Center" tab. From there you can also check statistics on the number of times your links have been clicked, the number of orders you have generated, and commissions you are owed. Note that if a user visits our site from one of your links, a cookie will be saved on their computer so that if they visit again and sign up any time within six months, you will earn the commission for that sale.');
+    $message['body'][] = t('Please note that the account you have created is only active for the purposes of checking your affiliate sales in the "affiliate center" tab. If you wish to become a full member at any point with the ability to message other members and boondock on their property, you can upgrade this account to a <a href="/membership-products">full membership</a>.');  
+    $message['body'][] = t('Thanks for coming on board, we look forward to working with you!');
+    $message['body'][] = t('-- The !site team', 
+      array('!site' => variable_get('site_name', 'Boondockers Welcome')));
+  }
+  else if ($message['id'] == 'user_register_no_approval_required')
+  {
+    $account = $message['params']['account'];
+    $message['body'][0] = t('!username,', array('!username' => $account->name));
+    $message['body'][] = t('Thank you for joining Boondockers Welcome. You may now log in to !login_uri using the following username and password:', 
+      array('!login_uri' => url('user', array('absolute' => TRUE, 'language' => $message['language']))));
+    $message['body'][] = t('username: !username<br>password: !password',
+      array('!username' => $account->name,
+            '!password' => $account->password));
+    $message['body'][] = t('You may also log in by clicking on this link or copying and pasting it in your browser:');
+    $timestamp = time();
+    $message['body'][] = t('!login_url',
+      array('!login_url' => url("user/reset/$account->uid/$timestamp/". md5($timestamp . $account->pass . $account->login), array('absolute' => TRUE))));
+    $message['body'][] = t('This is a one-time login, so it can be used only once.<p>After logging in, you will be redirected to the "Account Info" page so you can change your password to one of your choosing.');
+    $message['body'][] = t('-- The !site team', 
+      array('!site' => variable_get('site_name', 'Boondockers Welcome')));
+  }
+}
+
+// Implementation of hook_flag_default_flags()
+
+function BDW_role_rules_feature_flag_default_flags() {
+  $flags = array();
+  $flags[] = array(
+    'content_type' => 'user',
+    'name' => 'purchased_membership',
+    'title' => 'Purchased Membership',
+    'roles' => array('2'),
+    'global' => TRUE,
+    'flag_short' => 'Mark as Purchased',
+    'unflag_short' => 'Mark as Not Purchased',
+    'show_on_page' => FALSE,
+    'show_on_teaser' => FALSE,
+    'show_on_form' => FALSE,
+    'show_on_profile' => FALSE,
+    'status' => TRUE,
+    'locked' => array('show_on_page','show_on_teaser','show_on_form','show_on_profile','name','global'),
+  );
+  $flags[] = array(
+    'content_type' => 'user',
+    'name' => 'membership_expiring',
+    'title' => 'Membership Expiring',
+    'roles' => array('2'),
+    'global' => TRUE,
+    'flag_short' => 'Mark as Memberhsip Expiring',
+    'unflag_short' => 'Mark as Membership Not Expiring',
+    'show_on_page' => FALSE,
+    'show_on_teaser' => FALSE,
+    'show_on_form' => FALSE,
+    'show_on_profile' => FALSE,
+    'status' => TRUE,
+    'locked' => array('show_on_page','show_on_teaser','show_on_form','show_on_profile','name','global'),
+  );
+  return $flags;
+}
+
+function BDW_role_rules_feature_uc_get_message_alter(&$messages) {
+  $messages['completion_new_user'] = t('Welcome to Boondockers Welcome! Your payment has been processed, and your membership is now active.<p>A message with your login details and a separate welcome email should arrive in your inbox shortly. Please check your spam folder if you do not receive either of them, and add us to your contact list so that you can be sure to receive future emails from us and notifications of messages from other members.<p>You will be notified by email one month before your membership expires.');
+
+ $messages['completion_existing_user'] = $messages['completion_new_user'];
+
+ $messages['completion_logged_in'] = t('Thank you! Your payment has been processed, and your membership to Boondockers Welcome is now renewed. You will be notified by email one month before your membership next expires.');
+}
+
+function BDW_role_rules_feature_theme_registry_alter(&$theme_registry)
+{
+  if (!empty($theme_registry['uc_cart_complete_sale'])) {
+    $theme_registry['uc_cart_complete_sale']['function'] = 'BDW_role_rules_feature_theme_uc_cart_complete_sale';
+  }
+}
+
+function BDW_role_rules_feature_theme_uc_cart_complete_sale($variables) {
+  foreach ($variables['order']->products as $product)
+  {
+    if (preg_match("/^FullMembership-BDA-.*/", $product->model)) {
+      $variables['message'] .= t('<p>Because you have purchased a discounted membership that requires you provide a boondocking location, you must ensure that you have a valid one entered under the Boondocking Available tab of your account settings. Your membership will not be fully activated until you do.');
+    }
+  }
+  return $variables['message'];
+}
+             
+
