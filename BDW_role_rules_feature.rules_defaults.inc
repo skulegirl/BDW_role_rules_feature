@@ -252,33 +252,135 @@ function BDW_role_rules_feature_default_rules_configuration() {
       ]
     }
   }');
+  $items['uc_roles_custom_notify_when_role_renewed'] = entity_import('rules_config', '{ "uc_roles_custom_notify_when_role_renewed" : {
+      "LABEL" : "Custom notify when role renewed",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "REQUIRES" : [ "rules", "uc_roles" ],
+      "ON" : { "uc_roles_notify_renew" : [] },
+      "DO" : [
+        { "variable_add" : {
+            "USING" : { "type" : "uc_roles_expiration", "value" : [ "expiration" ] },
+            "PROVIDE" : { "variable_added" : { "expiration_var" : "expiration variable" } }
+          }
+        },
+        { "variable_add" : {
+            "USING" : { "type" : "uc_order", "value" : [ "order" ] },
+            "PROVIDE" : { "variable_added" : { "order_var" : "Order variable" } }
+          }
+        },
+        { "uc_roles_order_email" : {
+            "order" : [ "order" ],
+            "expiration" : [ "expiration" ],
+            "from" : "Boondockers Welcome \\u003Cadmin@boondockerswelcome.com\\u003E",
+            "addresses" : "[order:email]",
+            "subject" : "Your membership at [store:name] has been renewed",
+            "message" : "\\u003Cp\\u003EDear [order:customer:name],\\u003C\\/p\\u003E\\r\\n\\u003Cp\\u003EYour membership at [store:name] has been successfully renewed. It is now set to expire on \\u003C?php $expiration = db_query(\\u0027SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid\\u0027, array(\\u0027:uid\\u0027 =\\u003E $order_var-\\u003Euid))-\\u003EfetchField(); echo format_date($expiration, \\u0027custom\\u0027, \\u0027l, F jS, Y\\u0027);?\\u003E.\\r\\n\\r\\n\\u003C?php\\r\\n  if ($expiration_var-\\u003Erid == 13)\\r\\n  {\\r\\n    $order_user = user_load($order_var-\\u003Euid);\\r\\n    if (!in_array(\\u0027full member\\u0027, $order_user-\\u003Eroles)): ?\\u003E\\r\\n\\u003Cp\\u003EPlease note that your discounted membership level requires that you provide a boonodocking location before your membership will be fully activated. Please create a boondocking location as soon as possible to fully activate your membership.\\u003C?php endif;\\r\\n}?\\u003E\\r\\n\\r\\n\\u003Cp\\u003EThanks again,\\r\\n\\r\\n\\u003Cp\\u003EThe [store:link] team\\r\\n\\u003Cbr\\u003E[site:slogan]\\r\\n",
+            "format" : "3"
+          }
+        }
+      ]
+    }
+  }');
+  $items['uc_roles_custom_notify_when_role_renewed_after_expiry'] = entity_import('rules_config', '{ "uc_roles_custom_notify_when_role_renewed_after_expiry" : {
+      "LABEL" : "Custom notify when role renewed after expiry",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "REQUIRES" : [ "php", "rules", "uc_roles" ],
+      "ON" : { "uc_roles_notify_grant" : [] },
+      "IF" : [
+        { "php_eval" : { "code" : "global $user;\\r\\nreturn ($user-\\u003Euid != 0);" } }
+      ],
+      "DO" : [
+        { "variable_add" : {
+            "USING" : { "type" : "uc_roles_expiration", "value" : [ "expiration" ] },
+            "PROVIDE" : { "variable_added" : { "expiration_var" : "expiration variable" } }
+          }
+        },
+        { "variable_add" : {
+            "USING" : { "type" : "uc_order", "value" : [ "order" ] },
+            "PROVIDE" : { "variable_added" : { "order_var" : "Order variable" } }
+          }
+        },
+        { "uc_roles_order_email" : {
+            "order" : [ "order" ],
+            "expiration" : [ "expiration" ],
+            "from" : "Boondockers Welcome \\u003Cadmin@boondockerswelcome.com\\u003E",
+            "addresses" : "[order:email]",
+            "subject" : "Your membership at [store:name] has been renewed",
+            "message" : "\\u003Cp\\u003EDear [order:customer:name],\\u003C\\/p\\u003E\\r\\n\\u003Cp\\u003EYour membership at [store:name] has been successfully renewed. It is now set to expire on \\u003C?php $expiration = db_query(\\u0027SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid\\u0027, array(\\u0027:uid\\u0027 =\\u003E $order_var-\\u003Euid))-\\u003EfetchField(); echo format_date($expiration, \\u0027custom\\u0027, \\u0027l, F jS, Y\\u0027);?\\u003E.\\r\\n\\r\\n\\u003C?php\\r\\n  if ($expiration_var-\\u003Erid == 13)\\r\\n  {\\r\\n    $order_user = user_load($order_var-\\u003Euid);\\r\\n    if (!in_array(\\u0027full member\\u0027, $order_user-\\u003Eroles)): ?\\u003E\\r\\n\\u003Cp\\u003EPlease note that your discounted membership level requires that you provide a boonodocking location before your membership will be fully activated. Please create a boondocking location as soon as possible to fully activate your membership.\\u003C?php endif;\\r\\n}?\\u003E\\r\\n\\r\\n\\u003Cp\\u003EThanks again,\\r\\n\\r\\n\\u003Cp\\u003EThe [store:link] team\\r\\n\\u003Cbr\\u003E[site:slogan]\\r\\n",
+            "format" : "3"
+          }
+        }
+      ]
+    }
+  }');
+  $items['uc_roles_custom_role_notify_grant'] = entity_import('rules_config', '{ "uc_roles_custom_role_notify_grant" : {
+      "LABEL" : "Custom notify on role granted",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "REQUIRES" : [ "php", "rules", "uc_roles" ],
+      "ON" : { "uc_roles_notify_grant" : [] },
+      "IF" : [
+        { "php_eval" : { "code" : "global $user;\\r\\nreturn ($user-\\u003Euid == 0);" } }
+      ],
+      "DO" : [
+        { "variable_add" : {
+            "USING" : { "type" : "uc_roles_expiration", "value" : [ "expiration" ] },
+            "PROVIDE" : { "variable_added" : { "expiration_var" : "Expiration Var" } }
+          }
+        },
+        { "variable_add" : {
+            "USING" : { "type" : "uc_order", "value" : [ "order" ] },
+            "PROVIDE" : { "variable_added" : { "order_var" : "Order Var" } }
+          }
+        },
+        { "uc_roles_order_email" : {
+            "order" : [ "order" ],
+            "expiration" : [ "expiration" ],
+            "from" : "Boondockers Welcome \\u003Cadmin@boondockerswelcome.com\\u003E",
+            "addresses" : "[order:email]",
+            "subject" : "Your membership at [store:name] has been granted",
+            "message" : "\\u003Cp\\u003EDear [order:customer:name],\\u003C\\/p\\u003E\\r\\n\\u003Cp\\u003EYour membership at [store:name] has been successfully created. It is set to expire on \\u003C?php $expiration = db_query(\\u0027SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid\\u0027, array(\\u0027:uid\\u0027 =\\u003E $order_var-\\u003Euid))-\\u003EfetchField(); echo format_date($expiration, \\u0027custom\\u0027, \\u0027l, F jS, Y\\u0027);?\\u003E.\\r\\n\\u003Cp\\u003EYour login details and temporary password will arrive shortly in a separate email.\\r\\n\\r\\n\\u003C?php\\r\\n  if ($expiration_var-\\u003Erid == 13)\\r\\n  {\\r\\n    $order_user = user_load($order_var-\\u003Euid);\\r\\n    if (!in_array(\\u0027full member\\u0027, $order_user-\\u003Eroles)): ?\\u003E\\r\\n\\u003Cp\\u003EPlease note that your discounted membership level requires that you provide a boonodocking location before your membership will be fully activated. Please log in and create a boondocking location as soon as possible to fully activate your membership.\\u003C?php endif;\\r\\n}?\\u003E\\r\\n\\r\\n\\u003Cp\\u003EThanks again,\\r\\n\\r\\n\\u003Cp\\u003EThe [store:link] team\\r\\n\\u003Cbr\\u003E[site:slogan]\\r\\n",
+            "format" : "3"
+          }
+        }
+      ]
+    }
+  }');
+  $items['uc_roles_uc_roles_custom_role_notify_reminder'] = entity_import('rules_config', '{ "uc_roles_uc_roles_custom_role_notify_reminder" : {
+      "LABEL" : "Custom notify customer when a role is about to expire",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "REQUIRES" : [ "rules", "uc_roles" ],
+      "ON" : { "uc_roles_notify_reminder" : [] },
+      "DO" : [
+        { "variable_add" : {
+            "USING" : { "type" : "uc_roles_expiration", "value" : [ "expiration" ] },
+            "PROVIDE" : { "variable_added" : { "expiration_var" : "Expiration variable" } }
+          }
+        },
+        { "variable_add" : {
+            "USING" : { "type" : "user", "value" : [ "account" ] },
+            "PROVIDE" : { "variable_added" : { "account_var" : "Account variable" } }
+          }
+        },
+        { "uc_roles_user_email" : {
+            "account" : [ "account" ],
+            "expiration" : [ "expiration" ],
+            "from" : "Boondockers Welcome \\u003Cadmin@boondockerswelcome.com\\u003E",
+            "addresses" : "[account:mail]",
+            "subject" : "Your membership at [store:name] will expire soon",
+            "message" : "\\u003Cp\\u003EHi [account:name],\\u003C\\/p\\u003E\\r\\n\\r\\n\\u003Cp\\u003EThis message is to remind you that your \\u003C?php if (in_array(\\u0027founding member\\u0027, $account-\\u003Eroles) \\u0026\\u0026 !in_array(\\u0027paid member\\u0027,$account-\\u003Eroles)) echo \\u0027two years of free\\u0027; ?\\u003E membership with \\u003Ca href=\\u0027http:\\/\\/www.boondockerswelcome.com\\u0027\\u003EBoondockers Welcome\\u003C\\/a\\u003E will expire on \\u003C?php $expiration = db_query(\\u0027SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid\\u0027, array(\\u0027:uid\\u0027 =\\u003E $account-\\u003Euid))-\\u003EfetchField(); echo format_date($expiration, \\u0027custom\\u0027, \\u0027l, F jS, Y\\u0027); ?\\u003E. Once your membership expires, you will no longer be able to send or receive messages, access your bookmarks or post user recommendations.\\u003C\\/p\\u003E\\r\\n\\u003Cp\\u003EPlease log in and visit \\u003Ca href=\\u0027http:\\/\\/www.boondockerswelcome.com\\/membership-products\\u0027\\u003Eour membership products page\\u003C\\/a\\u003E to renew this membership before it expires.\\u003C\\/p\\u003E\\r\\n\\r\\n\\u003Cp\\u003EThanks again,\\u003C\\/p\\u003E\\r\\n\\r\\n\\u003Cp\\u003E[store:name]\\r\\n\\u003Cbr\\u003E[site:slogan]\\u003C\\/p\\u003E",
+            "format" : "3"
+          }
+        }
+      ]
+    }
+  }');
   return $items;
-}
-
-function BDW_role_rules_feature_default_rules_configuration_alter(&$configs) {
-
-foreach($configs['uc_role_notify_revoke']->actions() as $action)
-{
-  $action->settings['subject'] = t('Your membership at [store:name] has expired');
-  $action->settings['message'] = t("Your membership at Boondockers Welcome has expired! Until you renew, you will no longer be able to send or receive messages, view your bookmarks, or leave recommendations for other members. Please renew your membership as soon as possible by visiting <a href='http://www.boondockerswelcome.com/membership-products'>our membership products page</a>.\n\nWe hope to see you back soon,\n\n[store:name]\n[site:slogan]"); 
-}
-
-
-foreach($configs['uc_checkout_admin_notification']->actions() as $action)
-{
-  $action->settings['addresses'] = 'admin@boondockerswelcome.com
-marianne@boondockerswelcome.com';
-}
-  
-
-  // disable uc_checkout_customer_notification - we will instead do this 
-  // when the order goes into "complete". This will allow orders that are 
-  // placed by hand (i.e. upgrades charges for $5, etc), to be invoiced as 
-  // well as automated orders through the cart.
-  $configs['uc_checkout_customer_notification']->active = 0;
-
-  // disable default notify emails; expiry doesn't work.
-  $configs['uc_role_notify_grant']->active = 0;
-  $configs['uc_role_notify_renew']->active = 0;
-  $configs['uc_role_notify_reminder']->active = 0;
 }

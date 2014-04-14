@@ -1,6 +1,7 @@
 name = BDW_role_rules_feature
 core = 7.x
 package = Features
+version = 7.x-1.0
 dependencies[] = entity
 dependencies[] = flag
 dependencies[] = php
@@ -18,5 +19,7 @@ features[rules_config][] = rules_remove_membership_expired_role_from_user
 features[rules_config][] = rules_remove_membership_expiring_flag_from_user
 features[rules_config][] = rules_transfer_bda_req_membership_to_full_member_role
 features[rules_config][] = rules_transfer_full_membership_to_bda_req_role
-
-version = "7.x-1.0"
+features[rules_config][] = uc_roles_custom_notify_when_role_renewed
+features[rules_config][] = uc_roles_custom_notify_when_role_renewed_after_expiry
+features[rules_config][] = uc_roles_custom_role_notify_grant
+features[rules_config][] = uc_roles_uc_roles_custom_role_notify_reminder
