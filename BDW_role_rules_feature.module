@@ -116,29 +116,42 @@ function BDW_role_rules_feature_theme_uc_cart_complete_sale($variables) {
              
 function BDW_role_rules_feature_default_rules_configuration_alter(&$configs) {
 
-  foreach($configs['uc_role_notify_revoke']->actions() as $action)
+  if (isset($configs['uc_role_notify_revoke']))
   {
-    $action->settings['subject'] = t('Your membership at [store:name] has expired');
-    $action->settings['message'] = t("Your membership at Boondockers Welcome has expired! Until you renew, you will no longer be able to send or receive messages, view your bookmarks, or leave recommendations for other members. Please renew your membership as soon as possible by visiting <a href='http://www.boondockerswelcome.com/membership-products'>our membership products page</a>.\n\nWe hope to see you back soon,\n\n[store:name]\n[site:slogan]"); 
+    foreach($configs['uc_role_notify_revoke']->actions() as $action)
+    {
+      $action->settings['subject'] = t('Your membership at [store:name] has expired');
+      $action->settings['message'] = t("Your membership at Boondockers Welcome has expired! Until you renew, you will no longer be able to send or receive messages, view your bookmarks, or leave recommendations for other members. Please renew your membership as soon as possible by visiting <a href='http://www.boondockerswelcome.com/membership-products'>our membership products page</a>.\n\nWe hope to see you back soon,\n\n[store:name]\n[site:slogan]"); 
+    }
   }
 
-
-  foreach($configs['uc_checkout_admin_notification']->actions() as $action)
+  if (isset($configs['uc_checkout_admin_notification']))
   {
-    $action->settings['addresses'] = 'admin@boondockerswelcome.com
-  marianne@boondockerswelcome.com';
+    foreach($configs['uc_checkout_admin_notification']->actions() as $action)
+    {
+      $action->settings['addresses'] = 'admin@boondockerswelcome.com
+    marianne@boondockerswelcome.com';
+    }
   }
-  
 
-  // disable uc_checkout_customer_notification - we will instead do this 
-  // when the order goes into "complete". This will allow orders that are 
-  // placed by hand (i.e. upgrades charges for $5, etc), to be invoiced as 
-  // well as automated orders through the cart.
-  $configs['uc_checkout_customer_notification']->active = 0;
+  $disable_list = array(
+    // disable uc_checkout_customer_notification - we will instead do this 
+    // when the order goes into "complete". This will allow orders that are 
+    // placed by hand (i.e. upgrades charges for $5, etc), to be invoiced as 
+    // well as automated orders through the cart.
+    'uc_checkout_customer_notification',
+    // disable default notify emails; expiry doesn't work.
+    'uc_role_notify_grant',
+    'uc_role_notify_renew',
+    'uc_role_notify_reminder',
+  );
 
-  // disable default notify emails; expiry doesn't work.
-  $configs['uc_role_notify_grant']->active = 0;
-  $configs['uc_role_notify_renew']->active = 0;
-  $configs['uc_role_notify_reminder']->active = 0;
+  foreach ($disable_list as $setting)
+  {
+    if (isset($configs[$setting]))
+    {
+      $configs[$setting]->active = 0;
+    }
+  }
 }
 
