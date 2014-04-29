@@ -1,4 +1,10 @@
 <?php
+/**
+ * @file
+ * Code for the bdw_role_rules_feature feature.
+ */
+
+include_once 'bdw_role_rules_feature.features.inc';
 
 // Implementation of hook_mail_alter() 
 function bdw_role_rules_feature_mail_alter(&$message) {
@@ -50,43 +56,6 @@ function bdw_role_rules_feature_mail_alter(&$message) {
     $message['body'][] = t('-- The !site team', 
       array('!site' => variable_get('site_name', 'Boondockers Welcome')));
   }
-}
-
-// Implementation of hook_flag_default_flags()
-
-function bdw_role_rules_feature_flag_default_flags() {
-  $flags = array();
-  $flags[] = array(
-    'content_type' => 'user',
-    'name' => 'purchased_membership',
-    'title' => 'Purchased Membership',
-    'roles' => array('2'),
-    'global' => TRUE,
-    'flag_short' => 'Mark as Purchased',
-    'unflag_short' => 'Mark as Not Purchased',
-    'show_on_page' => FALSE,
-    'show_on_teaser' => FALSE,
-    'show_on_form' => FALSE,
-    'show_on_profile' => FALSE,
-    'status' => TRUE,
-    'locked' => array('show_on_page','show_on_teaser','show_on_form','show_on_profile','name','global'),
-  );
-  $flags[] = array(
-    'content_type' => 'user',
-    'name' => 'membership_expiring',
-    'title' => 'Membership Expiring',
-    'roles' => array('2'),
-    'global' => TRUE,
-    'flag_short' => 'Mark as Memberhsip Expiring',
-    'unflag_short' => 'Mark as Membership Not Expiring',
-    'show_on_page' => FALSE,
-    'show_on_teaser' => FALSE,
-    'show_on_form' => FALSE,
-    'show_on_profile' => FALSE,
-    'status' => TRUE,
-    'locked' => array('show_on_page','show_on_teaser','show_on_form','show_on_profile','name','global'),
-  );
-  return $flags;
 }
 
 function bdw_role_rules_feature_uc_get_message_alter(&$messages) {
