@@ -104,7 +104,7 @@ function bdw_role_rules_feature_flag_default_flags() {
   $flags['membership_expiring'] = array(
     'entity_type' => 'user',
     'title' => 'Membership Expiring',
-    'global' => TRUE,
+    'global' => 1,
     'types' => array(),
     'flag_short' => 'Mark as Memberhsip Expiring',
     'flag_long' => '',
@@ -134,7 +134,7 @@ function bdw_role_rules_feature_flag_default_flags() {
   $flags['purchased_membership'] = array(
     'entity_type' => 'user',
     'title' => 'Purchased Membership',
-    'global' => TRUE,
+    'global' => 1,
     'types' => array(),
     'flag_short' => 'Mark as Purchased',
     'flag_long' => '',
