@@ -9,6 +9,85 @@
  */
 function bdw_role_rules_feature_default_rules_configuration() {
   $items = array();
+  $items['rules_add_boondocking_available_flag_with_new_valid_bda_location'] = entity_import('rules_config', '{ "rules_add_boondocking_available_flag_with_new_valid_bda_location" : {
+      "LABEL" : "add boondocking available flag with new valid BDA location ",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
+      "REQUIRES" : [ "rules", "php", "flag", "profile2" ],
+      "ON" : { "profile2_insert" : [] },
+      "IF" : [
+        { "entity_has_field" : { "entity" : [ "profile2" ], "field" : "field_ba_bda_pref" } },
+        { "data_is" : { "data" : [ "profile2:field-ba-bda-pref" ], "value" : 0 } },
+        { "php_eval" : { "code" : "dd($profile2, \\u0027profile2\\u0027);\\r\\nreturn (location_has_coordinates($profile2-\\u003Efield_boondock_location[\\u0027und\\u0027][0]));" } }
+      ],
+      "DO" : [
+        { "flag_flaguser" : {
+            "flag" : "boondocking_available",
+            "user" : [ "profile2:user" ],
+            "flagging_user" : [ "profile2:user" ],
+            "permission_check" : 1
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_add_boondocking_available_flag_with_valid_bda_location'] = entity_import('rules_config', '{ "rules_add_boondocking_available_flag_with_valid_bda_location" : {
+      "LABEL" : "add boondocking available flag with valid BDA location",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
+      "REQUIRES" : [ "rules", "php", "flag", "profile2" ],
+      "ON" : { "profile2_update" : [] },
+      "IF" : [
+        { "entity_has_field" : { "entity" : [ "profile2" ], "field" : "field_ba_bda_pref" } },
+        { "data_is" : { "data" : [ "profile2:field-ba-bda-pref" ], "value" : 0 } },
+        { "php_eval" : { "code" : "return (location_has_coordinates($profile2-\\u003Efield_boondock_location[\\u0027und\\u0027][0]));" } }
+      ],
+      "DO" : [
+        { "flag_flaguser" : {
+            "flag" : "boondocking_available",
+            "user" : [ "profile2:user" ],
+            "flagging_user" : [ "profile2:user" ],
+            "permission_check" : 1
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_add_full_member_role_to_provisional_members_when_bda_flag_'] = entity_import('rules_config', '{ "rules_add_full_member_role_to_provisional_members_when_bda_flag_" : {
+      "LABEL" : "Add full member role to provisional members when BDA flag is set",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules" ],
+      "REQUIRES" : [ "rules", "mimemail", "flag" ],
+      "ON" : { "flag_flagged_boondocking_available" : [] },
+      "IF" : [
+        { "user_has_role" : {
+            "account" : [ "flagged-user" ],
+            "roles" : { "value" : { "13" : "13" } }
+          }
+        }
+      ],
+      "DO" : [
+        { "user_add_role" : { "account" : [ "flagged-user" ], "roles" : { "value" : { "8" : "8" } } } },
+        { "drupal_message" : {
+            "message" : "Thank you for adding a Boondocking Available location! You have now been promoted to a full member, and have full member privileges.",
+            "repeat" : 0
+          }
+        },
+        { "mimemail" : {
+            "key" : "full member granted",
+            "to" : [ "flagged-user:mail" ],
+            "subject" : "You have been promoted to a full member!",
+            "body" : "Dear [flagged-user:name],\\r\\n\\r\\nThank you for taking the time to enter a \\u0022Boondocking Available\\u0022 page with a location. Your generous offer to host other boondockers has now been made public, and your location will show up in searches on the site. \\r\\n\\r\\nNow that you have provided boondocking availability information, your membership is fully activated. This means that you now have the ability to send messages to other members, and create bookmarks for members who you might like to visit some day. Because of your membership requirements, should you ever remove your boondocking available location, your full-member privileges will be withdrawn until you either reinstate your boondocking availability or \\u003Ca href=\\u0022http:\\/\\/www.boondockerswelcome.com\\/membership-products\\/change-membership-type\\u0022\\u003Echange to an unrestricted membership\\u003C\\/a\\u003E.  See the \\u003Ca href=\\u0022http:\\/\\/www.boondockerswelcome.com\\/membership-products\\u0022\\u003Emembership products page\\u003C\\/a\\u003E for full details on all the different membership options.\\r\\n\\r\\nWelcome to the club, and happy boondocking!\\r\\n\\r\\nThe Boondockers Welcome Team",
+            "plaintext" : "Dear [flagged-user:name],\\r\\n\\r\\nThank you for taking the time to enter a \\u0022Boondocking Available\\u0022 page with a location. Your generous offer to host other boondockers has now been made public, and your location will show up in searches on the site. \\r\\n\\r\\nNow that you have provided boondocking availability information, your membership is fully activated. This means that you now have the ability to send messages to other members, and create bookmarks for members who you might like to visit some day. Because of your membership requirements, should you ever remove your boondocking available location, your full-member privileges will be withdrawn until you either reinstate your boondocking availability or change to an unrestricted membership at http:\\/\\/www.boondockerswelcome.com\\/membership-products\\/change-membership-type.  See the membership products page at http:\\/\\/www.boondockerswelcome.com\\/membership-products for full details on all the different membership options.\\r\\n\\r\\nWelcome to the club, and happy boondocking!\\r\\n\\r\\nThe Boondockers Welcome Team",
+            "language" : [ "" ]
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_add_full_member_role_to_user_if_bda'] = entity_import('rules_config', '{ "rules_add_full_member_role_to_user_if_bda" : {
       "LABEL" : "Add \\u0022full member\\u0022 role to user if BDA",
       "PLUGIN" : "reaction rule",
@@ -107,6 +186,148 @@ function bdw_role_rules_feature_default_rules_configuration() {
       ]
     }
   }');
+  $items['rules_membership_expired_warning'] = entity_import('rules_config', '{ "rules_membership_expired_warning" : {
+      "LABEL" : "Membership expired warning",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules" ],
+      "REQUIRES" : [ "rules", "conditionalvariables" ],
+      "ON" : { "init" : [] },
+      "IF" : [
+        { "user_has_role" : {
+            "account" : [ "site:current-user" ],
+            "roles" : { "value" : { "18" : "18" } }
+          }
+        },
+        { "NOT conditionalvariables_page_condition" : { "pages" : "cart*\\r\\nmembership-products*" } }
+      ],
+      "DO" : [
+        { "drupal_message" : {
+            "message" : "Your account is currently EXPIRED. You cannot send messages to other members or access your bookmarks, and your available boondocking location, if entered, will not appear to others until you have \\u003Ca href=\\u0022\\/membership-products\\u0022\\u003Erenewed your membership\\u003C\\/a\\u003E.",
+            "type" : "error",
+            "repeat" : 0
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_membership_expiring_warning'] = entity_import('rules_config', '{ "rules_membership_expiring_warning" : {
+      "LABEL" : "Membership expiring warning",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules" ],
+      "REQUIRES" : [ "flag", "conditionalvariables", "rules", "php" ],
+      "ON" : { "init" : [] },
+      "IF" : [
+        { "flag_flagged_user" : {
+            "flag" : "membership_expiring",
+            "user" : [ "site:current-user" ],
+            "flagging_user" : [ "site:current-user" ]
+          }
+        },
+        { "NOT conditionalvariables_page_condition" : { "pages" : "cart*\\r\\nmembership-products*" } }
+      ],
+      "DO" : [
+        { "variable_add" : {
+            "USING" : { "type" : "user", "value" : [ "site:current-user" ] },
+            "PROVIDE" : { "variable_added" : { "current_user_var" : "current-user variable" } }
+          }
+        },
+        { "drupal_message" : {
+            "message" : "Your account is due to expire on \\u003C?php\\r\\n  $expiration = db_query(\\u0022SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid\\u0022, array(\\u0027:uid\\u0027 =\\u003E $current_user_var-\\u003Euid))-\\u003EfetchField();\\r\\n  echo format_date($expiration, \\u0027custom\\u0027, \\u0027l, F jS, Y\\u0027);\\r\\n  ?\\u003E. Please \\u003Ca href=\\u0022\\/membership-products\\u0022\\u003Erenew your membership\\u003C\\/a\\u003E to avoid a loss in membership privileges.",
+            "type" : "warning",
+            "repeat" : 0
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_not_full_member_warning'] = entity_import('rules_config', '{ "rules_not_full_member_warning" : {
+      "LABEL" : "Not Full Member Warning",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules" ],
+      "REQUIRES" : [ "rules", "conditionalvariables" ],
+      "ON" : { "init" : [] },
+      "IF" : [
+        { "user_has_role" : {
+            "account" : [ "site:current-user" ],
+            "roles" : { "value" : { "13" : "13" } }
+          }
+        },
+        { "NOT user_has_role" : {
+            "account" : [ "site:current-user" ],
+            "roles" : { "value" : { "8" : "8" } }
+          }
+        },
+        { "NOT conditionalvariables_page_condition" : { "pages" : "membership-products*\\r\\ncart*\\r\\nuser\\/[site:current-user:uid]\\/edit*\\r\\nfilefield*" } }
+      ],
+      "DO" : [
+        { "drupal_message" : {
+            "message" : "WARNING! Your account does not currently have Full Member privileges. You need to either provide a \\u003Ca href=\\u0022\\/user\\/[site:current-user:uid]\\/edit\\/boondocking_available\\u0022\\u003E boondocking availabile location in your profile\\u003C\\/a\\u003E to meet the terms of your membership, or you need to \\u003Ca href=\\u0022\\/membership-products\\/change-membership-type\\u0022\\u003Echange your account to an unrestricted membership\\u003C\\/a\\u003E. Until this is resolved you cannot send messages to other members, or receive or give user recommendations, in addition to some other restrictions. Please resolve this quickly for your best Boondockers Welcome experience!",
+            "type" : "warning",
+            "repeat" : 0
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_redirect_to_account_info_on_first_login'] = entity_import('rules_config', '{ "rules_redirect_to_account_info_on_first_login" : {
+      "LABEL" : "Redirect to account info on first login",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_misc_rules", "redirection" ],
+      "REQUIRES" : [ "BDW_custom_changes", "rules" ],
+      "ON" : { "user_login" : [] },
+      "IF" : [ { "BDW_custom_changes_rules_condition_first_login" : [] } ],
+      "DO" : [
+        { "drupal_message" : {
+            "message" : "Welcome to Boondockers Welcome! As your first order of business, please change your password to one of your choosing.",
+            "repeat" : 0
+          }
+        },
+        { "redirect" : { "url" : "user\\/[account:uid]\\/edit" } }
+      ]
+    }
+  }');
+  $items['rules_redirect_to_user_view_after_profile_saved'] = entity_import('rules_config', '{ "rules_redirect_to_user_view_after_profile_saved" : {
+      "LABEL" : "Redirect to user view after profile saved",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_misc_rules", "redirection" ],
+      "REQUIRES" : [ "rules", "profile2" ],
+      "ON" : { "profile2_update" : [], "profile2_insert" : [] },
+      "DO" : [
+        { "redirect" : { "url" : "\\/users\\/[site:current-user:name]", "force" : 0 } }
+      ]
+    }
+  }');
+  $items['rules_remove_boondocking_available_flag_with_no_valid_bda_locati'] = entity_import('rules_config', '{ "rules_remove_boondocking_available_flag_with_no_valid_bda_locati" : {
+      "LABEL" : "remove boondocking available flag with no valid BDA location",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
+      "REQUIRES" : [ "rules", "php", "flag", "profile2" ],
+      "ON" : { "profile2_update" : [] },
+      "IF" : [
+        { "entity_has_field" : { "entity" : [ "profile2" ], "field" : "field_ba_bda_pref" } },
+        { "OR" : [
+            { "data_is" : { "data" : [ "profile2:field-ba-bda-pref" ], "value" : 1 } },
+            { "php_eval" : { "code" : "return (!location_has_coordinates($profile2-\\u003Efield_boondock_location[\\u0027und\\u0027][0]));" } }
+          ]
+        }
+      ],
+      "DO" : [
+        { "flag_unflaguser" : {
+            "flag" : "boondocking_available",
+            "user" : [ "profile2:user" ],
+            "flagging_user" : [ "profile2:user" ],
+            "permission_check" : 1
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_remove_expiring_membership_flag_from_user'] = entity_import('rules_config', '{ "rules_remove_expiring_membership_flag_from_user" : {
       "LABEL" : "Remove \\u0022membership_expiring\\u0022 flag from user",
       "PLUGIN" : "reaction rule",
@@ -115,9 +336,11 @@ function bdw_role_rules_feature_default_rules_configuration() {
       "REQUIRES" : [ "rules", "flag", "uc_roles" ],
       "ON" : { "uc_roles_notify_revoke" : [] },
       "IF" : [
-        { "data_is" : { "data" : [ "expiration:rid" ], "value" : "8" } },
-        { "data_is" : { "data" : [ "expiration:rid" ], "value" : "13" } },
-        { "OR" : [] }
+        { "OR" : [
+            { "data_is" : { "data" : [ "expiration:rid" ], "value" : "8" } },
+            { "data_is" : { "data" : [ "expiration:rid" ], "value" : "13" } }
+          ]
+        }
       ],
       "DO" : [
         { "flag_unflaguser" : {
@@ -125,6 +348,34 @@ function bdw_role_rules_feature_default_rules_configuration() {
             "user" : [ "account" ],
             "flagging_user" : [ "account" ],
             "permission_check" : 0
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_remove_full_member_role_no_bda'] = entity_import('rules_config', '{ "rules_remove_full_member_role_no_bda" : {
+      "LABEL" : "Remove full member role for provisional members when BDA flag is unest",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "bdw_role_rules" ],
+      "REQUIRES" : [ "rules", "mimemail", "flag" ],
+      "ON" : { "flag_unflagged_boondocking_available" : [] },
+      "IF" : [
+        { "user_has_role" : {
+            "account" : [ "flagged-user" ],
+            "roles" : { "value" : { "13" : "13" } }
+          }
+        }
+      ],
+      "DO" : [
+        { "user_remove_role" : { "account" : [ "flagged-user" ], "roles" : { "value" : { "8" : "8" } } } },
+        { "mimemail" : {
+            "key" : "no longer full member email",
+            "to" : [ "flagged-user:mail" ],
+            "subject" : "WARNING! Full membership privileges have been revoked!",
+            "body" : "Dear [flagged-user:name],\\r\\n\\r\\nYou recently removed your \\u0022Boondocking Available\\u0022 location from your Boondockers Welcome account. As a condition of your membership, you are required to provide a boondocking location in order to have full membership privileges. Please either re-instate your Boondocking Available location, or consider \\u003Ca href=\\u0022http:\\/\\/www.boondockerswelcome.com\\/membership-products\\/change-membership-type\\u0022\\u003Echanging to an unrestricted membership\\u003C\\/a\\u003E to regain your full member privileges. Only full members can send messages to other members, create bookmark lists of other members, and receive or leave user recommendations.\\r\\n\\r\\nRemember, when you provide a boondocking available location you are never under any obligation to host a fellow member, nor will they be able to determine your address from your location information. Your general location (either narrowed down by town\\/city or postal code if provided) will be shown on the search results map, and users will be able to send you messages through BoondockersWelcome.com, but your specific location or private contact information will never be made available to anyone.\\r\\n\\r\\nSincerely,\\r\\n\\r\\nThe Boondockers Welcome Team",
+            "plaintext" : "Dear [flagged-user:name],\\r\\n\\r\\nYou recently removed your \\u0022Boondocking Available\\u0022 location from your Boondockers Welcome account. As a condition of your membership, you are required to provide a boondocking location in order to have full membership privileges. Please either re-instate your Boondocking Available location, or consider changing to an unrestricted membership (visit http:\\/\\/www.boondockerswelcome.com\\/membership-products\\/change-membership-type for details) to regain your full member privileges. Only full members can send messages to other members, create bookmark lists of other members, and receive or leave user recommendations.\\r\\n\\r\\nRemember, when you provide a boondocking available location you are never under any obligation to host a fellow member, nor will they be able to determine your address from your location information. Your general location (either narrowed down by town\\/city or postal code if provided) will be shown on the search results map, and users will be able to send you messages through BoondockersWelcome.com, but your specific location or private contact information will never be made available to anyone.\\r\\n\\r\\nSincerely,\\r\\n\\r\\nThe Boondockers Welcome Team",
+            "language" : [ "" ]
           }
         }
       ]
@@ -257,7 +508,7 @@ function bdw_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
       "TAGS" : [ "bdw_role_rules", "notifications" ],
-      "REQUIRES" : [ "rules", "uc_roles" ],
+      "REQUIRES" : [ "rules", "php", "uc_roles" ],
       "ON" : { "uc_roles_notify_renew" : [] },
       "DO" : [
         { "variable_add" : {
@@ -356,7 +607,7 @@ function bdw_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
       "TAGS" : [ "bdw_role_rules", "notifications" ],
-      "REQUIRES" : [ "rules", "uc_roles" ],
+      "REQUIRES" : [ "rules", "php", "uc_roles" ],
       "ON" : { "uc_roles_notify_reminder" : [] },
       "DO" : [
         { "variable_add" : {
