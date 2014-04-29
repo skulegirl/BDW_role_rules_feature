@@ -1,20 +1,20 @@
 <?php
 /**
  * @file
- * BDW_role_rules_feature.rules_defaults.inc
+ * bdw_role_rules_feature.rules_defaults.inc
  */
 
 /**
  * Implements hook_default_rules_configuration().
  */
-function BDW_role_rules_feature_default_rules_configuration() {
+function bdw_role_rules_feature_default_rules_configuration() {
   $items = array();
   $items['rules_add_full_member_role_to_user_if_bda'] = entity_import('rules_config', '{ "rules_add_full_member_role_to_user_if_bda" : {
       "LABEL" : "Add \\u0022full member\\u0022 role to user if BDA",
       "PLUGIN" : "reaction rule",
       "WEIGHT" : "2",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "user_roles" ],
+      "TAGS" : [ "bdw_role_rules", "user_roles" ],
       "REQUIRES" : [ "rules", "flag", "uc_roles" ],
       "ON" : { "uc_roles_notify_grant" : [] },
       "IF" : [
@@ -39,7 +39,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Add \\u0022membership expired\\u0022 role to user",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "user_roles" ],
+      "TAGS" : [ "bdw_role_rules", "user_roles" ],
       "REQUIRES" : [ "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_revoke" : [] },
       "IF" : [
@@ -58,7 +58,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Add \\u0022membership_expiring\\u0022 flag to user",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "flag_user" ],
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
       "REQUIRES" : [ "flag", "uc_roles" ],
       "ON" : { "uc_roles_notify_reminder" : [] },
       "DO" : [
@@ -77,7 +77,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "WEIGHT" : "2",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "flag_user" ],
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
       "REQUIRES" : [ "uc_order", "flag", "rules" ],
       "ON" : { "uc_order_status_update" : [] },
       "IF" : [
@@ -111,7 +111,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Remove \\u0022membership_expiring\\u0022 flag from user",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "flag_user" ],
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
       "REQUIRES" : [ "rules", "flag", "uc_roles" ],
       "ON" : { "uc_roles_notify_revoke" : [] },
       "IF" : [
@@ -135,7 +135,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "WEIGHT" : "1",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "user_roles" ],
+      "TAGS" : [ "bdw_role_rules", "user_roles" ],
       "REQUIRES" : [ "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_revoke" : [] },
       "IF" : [ { "data_is" : { "data" : [ "expiration:rid" ], "value" : "13" } } ],
@@ -149,7 +149,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "WEIGHT" : "2",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "flag_user" ],
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
       "REQUIRES" : [ "uc_order", "rules" ],
       "ON" : { "uc_order_status_update" : [] },
       "IF" : [
@@ -177,7 +177,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "WEIGHT" : "2",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "flag_user" ],
+      "TAGS" : [ "bdw_role_rules", "flag_user" ],
       "REQUIRES" : [ "uc_order", "flag" ],
       "ON" : { "uc_order_status_update" : [] },
       "IF" : [
@@ -206,7 +206,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Transfer BDA req membership to full member role",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "user_roles" ],
+      "TAGS" : [ "bdw_role_rules", "user_roles" ],
       "REQUIRES" : [ "rules", "php", "uc_roles" ],
       "ON" : { "uc_roles_notify_grant" : [] },
       "IF" : [
@@ -231,7 +231,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Transfer full membership to BDA req role",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "user_roles" ],
+      "TAGS" : [ "bdw_role_rules", "user_roles" ],
       "REQUIRES" : [ "rules", "php", "uc_roles" ],
       "ON" : { "uc_roles_notify_grant" : [] },
       "IF" : [
@@ -256,7 +256,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Custom notify when role renewed",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "TAGS" : [ "bdw_role_rules", "notifications" ],
       "REQUIRES" : [ "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_renew" : [] },
       "DO" : [
@@ -287,7 +287,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Custom notify when role renewed after expiry",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "TAGS" : [ "bdw_role_rules", "notifications" ],
       "REQUIRES" : [ "php", "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_grant" : [] },
       "IF" : [
@@ -321,7 +321,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Custom notify on role granted",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "TAGS" : [ "bdw_role_rules", "notifications" ],
       "REQUIRES" : [ "php", "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_grant" : [] },
       "IF" : [
@@ -355,7 +355,7 @@ function BDW_role_rules_feature_default_rules_configuration() {
       "LABEL" : "Custom notify customer when a role is about to expire",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
-      "TAGS" : [ "BDW_role_rules", "notifications" ],
+      "TAGS" : [ "bdw_role_rules", "notifications" ],
       "REQUIRES" : [ "rules", "uc_roles" ],
       "ON" : { "uc_roles_notify_reminder" : [] },
       "DO" : [

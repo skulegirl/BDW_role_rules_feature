@@ -1,4 +1,4 @@
-name = BDW_role_rules_feature
+name = bdw_role_rules_feature
 core = 7.x
 package = Features
 version = 7.x-1.0

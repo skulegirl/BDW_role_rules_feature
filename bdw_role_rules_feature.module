@@ -1,7 +1,7 @@
 <?php
 
 // Implementation of hook_mail_alter() 
-function BDW_role_rules_feature_mail_alter(&$message) {
+function bdw_role_rules_feature_mail_alter(&$message) {
   // if this is a user registration email, customize it based on the role 
   // (i.e. member vs. affiliate)
   if ($message['id'] == 'logintoboggan_register_no_approval_required')
@@ -54,7 +54,7 @@ function BDW_role_rules_feature_mail_alter(&$message) {
 
 // Implementation of hook_flag_default_flags()
 
-function BDW_role_rules_feature_flag_default_flags() {
+function bdw_role_rules_feature_flag_default_flags() {
   $flags = array();
   $flags[] = array(
     'content_type' => 'user',
@@ -89,7 +89,7 @@ function BDW_role_rules_feature_flag_default_flags() {
   return $flags;
 }
 
-function BDW_role_rules_feature_uc_get_message_alter(&$messages) {
+function bdw_role_rules_feature_uc_get_message_alter(&$messages) {
   $messages['completion_new_user'] = t('Welcome to Boondockers Welcome! Your payment has been processed, and your membership is now active.<p>A message with your login details and a separate welcome email should arrive in your inbox shortly. Please check your spam folder if you do not receive either of them, and add us to your contact list so that you can be sure to receive future emails from us and notifications of messages from other members.<p>You will be notified by email one month before your membership expires.');
 
  $messages['completion_existing_user'] = $messages['completion_new_user'];
@@ -97,14 +97,14 @@ function BDW_role_rules_feature_uc_get_message_alter(&$messages) {
  $messages['completion_logged_in'] = t('Thank you! Your payment has been processed, and your membership to Boondockers Welcome is now renewed. You will be notified by email one month before your membership next expires.');
 }
 
-function BDW_role_rules_feature_theme_registry_alter(&$theme_registry)
+function bdw_role_rules_feature_theme_registry_alter(&$theme_registry)
 {
   if (!empty($theme_registry['uc_cart_complete_sale'])) {
-    $theme_registry['uc_cart_complete_sale']['function'] = 'BDW_role_rules_feature_theme_uc_cart_complete_sale';
+    $theme_registry['uc_cart_complete_sale']['function'] = 'bdw_role_rules_feature_theme_uc_cart_complete_sale';
   }
 }
 
-function BDW_role_rules_feature_theme_uc_cart_complete_sale($variables) {
+function bdw_role_rules_feature_theme_uc_cart_complete_sale($variables) {
   foreach ($variables['order']->products as $product)
   {
     if (preg_match("/^FullMembership-BDA-.*/", $product->model)) {
@@ -114,7 +114,7 @@ function BDW_role_rules_feature_theme_uc_cart_complete_sale($variables) {
   return $variables['message'];
 }
              
-function BDW_role_rules_feature_default_rules_configuration_alter(&$configs) {
+function bdw_role_rules_feature_default_rules_configuration_alter(&$configs) {
 
   if (isset($configs['uc_role_notify_revoke']))
   {
