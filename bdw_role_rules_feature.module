@@ -108,7 +108,7 @@ function bdw_role_rules_feature_default_rules_configuration_alter(&$configs) {
     // when the order goes into "complete". This will allow orders that are 
     // placed by hand (i.e. upgrades charges for $5, etc), to be invoiced as 
     // well as automated orders through the cart.
-    'uc_checkout_customer_notification',
+//    'uc_checkout_customer_notification',
     // disable default notify emails; expiry doesn't work.
     'uc_role_notify_grant',
     'uc_role_notify_renew',
