@@ -26,6 +26,7 @@ function bdw_role_rules_feature_flag_default_flags() {
     'weight' => 0,
     'show_in_links' => array(
       'full' => 0,
+      'diff_standard' => 0,
       'token' => 0,
     ),
     'show_as_field' => 0,
@@ -34,20 +35,18 @@ function bdw_role_rules_feature_flag_default_flags() {
     'show_contextual_link' => FALSE,
     'show_on_profile' => 0,
     'access_uid' => '',
-    'api_version' => 3,
     'module' => 'bdw_role_rules_feature',
     'locked' => array(
       0 => 'name',
     ),
+    'api_version' => 3,
   );
   // Exported flag: "Bookmarks".
   $flags['bookmarks'] = array(
     'entity_type' => 'node',
     'title' => 'Bookmarks',
     'global' => 0,
-    'types' => array(
-      0 => 'profile',
-    ),
+    'types' => array(),
     'flag_short' => 'Bookmark this user',
     'flag_long' => 'Add this user to your bookmarks',
     'flag_message' => 'This user has been added to your bookmarks',
@@ -66,11 +65,11 @@ function bdw_role_rules_feature_flag_default_flags() {
     'access_author' => '',
     'show_contextual_link' => FALSE,
     'i18n' => 0,
-    'api_version' => 3,
     'module' => 'bdw_role_rules_feature',
     'locked' => array(
       0 => 'name',
     ),
+    'api_version' => 3,
   );
   // Exported flag: "User provides boondocking".
   $flags['boondocking_available'] = array(
@@ -94,11 +93,11 @@ function bdw_role_rules_feature_flag_default_flags() {
     'show_contextual_link' => FALSE,
     'show_on_profile' => 0,
     'access_uid' => '',
-    'api_version' => 3,
     'module' => 'bdw_role_rules_feature',
     'locked' => array(
       0 => 'name',
     ),
+    'api_version' => 3,
   );
   // Exported flag: "Membership Expiring".
   $flags['membership_expiring'] = array(
@@ -115,19 +114,21 @@ function bdw_role_rules_feature_flag_default_flags() {
     'unflag_denied_text' => '',
     'link_type' => 'toggle',
     'weight' => 0,
-    'show_in_links' => array(),
-    'show_as_field' => FALSE,
-    'show_on_form' => FALSE,
+    'show_in_links' => array(
+      'full' => 0,
+      'diff_standard' => 0,
+      'token' => 0,
+    ),
+    'show_as_field' => 0,
+    'show_on_form' => 0,
     'access_author' => '',
     'show_contextual_link' => FALSE,
-    'show_on_profile' => FALSE,
+    'show_on_profile' => 0,
     'access_uid' => '',
     'module' => 'bdw_role_rules_feature',
     'locked' => array(
       0 => 'name',
     ),
-    'show_on_page' => FALSE,
-    'show_on_teaser' => FALSE,
     'api_version' => 3,
   );
   // Exported flag: "Purchased Membership".
@@ -156,8 +157,6 @@ function bdw_role_rules_feature_flag_default_flags() {
     'locked' => array(
       0 => 'name',
     ),
-    'show_on_page' => FALSE,
-    'show_on_teaser' => FALSE,
     'api_version' => 3,
   );
   return $flags;

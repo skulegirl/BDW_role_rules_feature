@@ -9,6 +9,25 @@
  */
 function bdw_role_rules_feature_default_rules_configuration() {
   $items = array();
+  $items['rules_add_affiliate_role_after_profile_info_is_created'] = entity_import('rules_config', '{ "rules_add_affiliate_role_after_profile_info_is_created" : {
+      "LABEL" : "Add affiliate role after profile info is created",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "affiliate" ],
+      "REQUIRES" : [ "rules", "profile2" ],
+      "ON" : { "profile2_insert" : [] },
+      "IF" : [
+        { "data_is" : { "data" : [ "profile2:type" ], "value" : "affiliate_info" } }
+      ],
+      "DO" : [
+        { "user_add_role" : {
+            "account" : [ "profile2:user" ],
+            "roles" : { "value" : { "19" : "19" } }
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_add_boondocking_available_flag_with_new_valid_bda_location'] = entity_import('rules_config', '{ "rules_add_boondocking_available_flag_with_new_valid_bda_location" : {
       "LABEL" : "add boondocking available flag with new valid BDA location ",
       "PLUGIN" : "reaction rule",
@@ -19,7 +38,7 @@ function bdw_role_rules_feature_default_rules_configuration() {
       "IF" : [
         { "entity_has_field" : { "entity" : [ "profile2" ], "field" : "field_ba_bda_pref" } },
         { "data_is" : { "data" : [ "profile2:field-ba-bda-pref" ], "value" : 0 } },
-        { "php_eval" : { "code" : "dd($profile2, \\u0027profile2\\u0027);\\r\\nreturn (location_has_coordinates($profile2-\\u003Efield_boondock_location[\\u0027und\\u0027][0]));" } }
+        { "php_eval" : { "code" : "return (location_has_coordinates($profile2-\\u003Efield_boondock_location[\\u0027und\\u0027][0]));" } }
       ],
       "DO" : [
         { "flag_flaguser" : {
@@ -186,13 +205,38 @@ function bdw_role_rules_feature_default_rules_configuration() {
       ]
     }
   }');
+  $items['rules_email_on_new_testimonial'] = entity_import('rules_config', '{ "rules_email_on_new_testimonial" : {
+      "LABEL" : "Email on New Testimonial",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "notifications" ],
+      "REQUIRES" : [ "rules", "mimemail" ],
+      "ON" : { "node_insert--testimonial" : { "bundle" : "testimonial" } },
+      "DO" : [
+        { "mimemail" : {
+            "key" : "Testimonial Submitted Notification",
+            "to" : "marianne@boondockerswelcome.com, admin@boondockerswelcome.com",
+            "subject" : "New Testimonial has been Submitted",
+            "body" : "testimA new testimonial, \\u003Ca href=\\u0022[node:url]\\u0022\\u003E[node:title]\\u003C\\/a\\u003E, has been created. It needs to be reviewed and then published.",
+            "language" : [ "" ]
+          }
+        },
+        { "redirect" : { "url" : "[site:url]" } },
+        { "drupal_message" : {
+            "message" : "Thank you for your testimonial submission. It will be posted after being reviewed by our team.",
+            "repeat" : 0
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_membership_expired_warning'] = entity_import('rules_config', '{ "rules_membership_expired_warning" : {
       "LABEL" : "Membership expired warning",
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
       "TAGS" : [ "bdw_role_rules" ],
-      "REQUIRES" : [ "rules", "conditionalvariables" ],
-      "ON" : { "init" : [] },
+      "REQUIRES" : [ "rules", "conditionalvariables", "fools_rules" ],
+      "ON" : { "fools_rules_event_page_alter" : [] },
       "IF" : [
         { "user_has_role" : {
             "account" : [ "site:current-user" ],
@@ -216,8 +260,8 @@ function bdw_role_rules_feature_default_rules_configuration() {
       "PLUGIN" : "reaction rule",
       "OWNER" : "rules",
       "TAGS" : [ "bdw_role_rules" ],
-      "REQUIRES" : [ "flag", "conditionalvariables", "rules", "php" ],
-      "ON" : { "init" : [] },
+      "REQUIRES" : [ "flag", "conditionalvariables", "rules", "php", "fools_rules" ],
+      "ON" : { "fools_rules_event_page_alter" : [] },
       "IF" : [
         { "flag_flagged_user" : {
             "flag" : "membership_expiring",
@@ -260,16 +304,51 @@ function bdw_role_rules_feature_default_rules_configuration() {
             "roles" : { "value" : { "8" : "8" } }
           }
         },
-        { "NOT conditionalvariables_page_condition" : { "pages" : "membership-products*\\r\\ncart*\\r\\nuser\\/[site:current-user:uid]\\/edit*\\r\\nfilefield*" } }
+        { "NOT conditionalvariables_page_condition" : { "pages" : "membership-products*\\r\\ncart*\\r\\nuser\\/[site:current-user:uid]\\/edit*\\r\\nfilefield*\\r\\nsystem\\/ajax*" } }
       ],
       "DO" : [
         { "drupal_message" : {
-            "message" : "WARNING! Your account does not currently have Full Member privileges. You need to either provide a \\u003Ca href=\\u0022\\/user\\/[site:current-user:uid]\\/edit\\/boondocking_available\\u0022\\u003E boondocking availabile location in your profile\\u003C\\/a\\u003E to meet the terms of your membership, or you need to \\u003Ca href=\\u0022\\/membership-products\\/change-membership-type\\u0022\\u003Echange your account to an unrestricted membership\\u003C\\/a\\u003E. Until this is resolved you cannot send messages to other members, or receive or give user recommendations, in addition to some other restrictions. Please resolve this quickly for your best Boondockers Welcome experience!",
+            "message" : "WARNING! Your account does not currently have Full Member privileges. You need to either provide a \\u003Ca href=\\u0022\\/user\\/[site:current-user:uid]\\/edit\\/boondocking_available\\u0022\\u003E valid boondocking availabile location in your profile\\u003C\\/a\\u003E to meet the terms of your membership, or you need to \\u003Ca href=\\u0022\\/membership-products\\/change-membership-type\\u0022\\u003Echange your account to an unrestricted membership\\u003C\\/a\\u003E. Until this is resolved you cannot send messages to other members, or receive or give user recommendations, in addition to some other restrictions. Please resolve this quickly for your best Boondockers Welcome experience!",
             "type" : "warning",
             "repeat" : 0
           }
         }
       ]
+    }
+  }');
+  $items['rules_notify_user_after_a_recommendation_is_posted'] = entity_import('rules_config', '{ "rules_notify_user_after_a_recommendation_is_posted" : {
+      "LABEL" : "Notify user after a recommendation is posted",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "notifications", "user recommendation" ],
+      "REQUIRES" : [ "rules", "mimemail" ],
+      "ON" : { "node_insert--user_recommendation" : { "bundle" : "user_recommendation" } },
+      "DO" : [
+        { "entity_fetch" : {
+            "USING" : { "type" : "user", "id" : [ "node:field-ur-fellow-boondocker:uid" ] },
+            "PROVIDE" : { "entity_fetched" : { "recommended_user" : "recommended user" } }
+          }
+        },
+        { "mimemail" : {
+            "key" : "A new user recommendation has been posted",
+            "to" : [ "recommended-user:mail" ],
+            "subject" : "You\\u0027ve just received a user recommendation!",
+            "body" : "Dear [recommended-user:name],\\r\\n\\r\\nYou\\u0027ve just received a user recommendation from [node:author:name] on [site:name] titled \\u0022[node:title]\\u0022. Feel free to check it out at [node:url] when you get a chance.\\r\\n\\r\\nHappy Boondocking!\\r\\n\\r\\nThe [site:name] team.",
+            "plaintext" : [ "" ],
+            "language" : [ "" ]
+          }
+        }
+      ]
+    }
+  }');
+  $items['rules_redirect_after_testimonial_submission'] = entity_import('rules_config', '{ "rules_redirect_after_testimonial_submission" : {
+      "LABEL" : "Redirect after Testimonial Submission",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "Testimonials" ],
+      "REQUIRES" : [ "rules" ],
+      "ON" : { "node_insert--testimonial" : { "bundle" : "testimonial" } },
+      "DO" : []
     }
   }');
   $items['rules_redirect_to_account_info_on_first_login'] = entity_import('rules_config', '{ "rules_redirect_to_account_info_on_first_login" : {
@@ -288,6 +367,23 @@ function bdw_role_rules_feature_default_rules_configuration() {
         },
         { "redirect" : { "url" : "user\\/[account:uid]\\/edit" } }
       ]
+    }
+  }');
+  $items['rules_redirect_to_user_page_after_updating_user_info'] = entity_import('rules_config', '{ "rules_redirect_to_user_page_after_updating_user_info" : {
+      "LABEL" : "Redirect to user page after updating user info",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "BDW_misc_rules", "redirection" ],
+      "REQUIRES" : [ "rules" ],
+      "ON" : { "user_update" : [] },
+      "IF" : [
+        { "NOT data_is" : {
+            "data" : [ "site:current-page:path" ],
+            "value" : "cart\\/checkout\\/review"
+          }
+        }
+      ],
+      "DO" : [ { "redirect" : { "url" : "[account:url]" } } ]
     }
   }');
   $items['rules_redirect_to_user_view_after_profile_saved'] = entity_import('rules_config', '{ "rules_redirect_to_user_view_after_profile_saved" : {
@@ -453,6 +549,27 @@ function bdw_role_rules_feature_default_rules_configuration() {
       ]
     }
   }');
+  $items['rules_send_email_when_new_affiliate_is_created'] = entity_import('rules_config', '{ "rules_send_email_when_new_affiliate_is_created" : {
+      "LABEL" : "Send Email When new affiliate is created",
+      "PLUGIN" : "reaction rule",
+      "OWNER" : "rules",
+      "TAGS" : [ "affiliate" ],
+      "REQUIRES" : [ "rules", "profile2" ],
+      "ON" : { "profile2_insert" : [] },
+      "IF" : [
+        { "data_is" : { "data" : [ "profile2:type" ], "value" : "affiliate_info" } }
+      ],
+      "DO" : [
+        { "mail" : {
+            "to" : "admin@boondockerswelcome.com, marianne@boondockerswelcome.com",
+            "subject" : "New Affiliate",
+            "message" : "A new affiliate, [profile2:user:name], has signed up at BoondockersWelcome. See their affiliate details \\u003Ca href=\\u0022\\/user\\/[profile2:user:uid]\\/edit\\/affiliate_info\\u0022\\u003Ehere\\u003C\\/a\\u003E.",
+            "language" : [ "" ]
+          }
+        }
+      ]
+    }
+  }');
   $items['rules_transfer_bda_req_membership_to_full_member_role'] = entity_import('rules_config', '{ "rules_transfer_bda_req_membership_to_full_member_role" : {
       "LABEL" : "Transfer BDA req membership to full member role",
       "PLUGIN" : "reaction rule",
@@ -469,7 +586,7 @@ function bdw_role_rules_feature_default_rules_configuration() {
         }
       ],
       "DO" : [
-        { "php_eval" : { "code" : "  $curtime = time();\\r\\n  $old_timestamp = $curtime;\\r\\n  $old_expirations = db_query(\\u0022SELECT expiration FROM {uc_roles_expirations} WHERE uid = %d AND rid = 13\\u0022, $order-\\u003Euid);\\r\\n  while ($old_expiration = db_fetch_object($old_expirations))\\r\\n  {\\r\\n    \\/\\/ there should really only be one entry, but for the benefit of the doubt,\\r\\n    \\/\\/ use the one with the greatest timestamp\\r\\n    if ($old_expiration-\\u003Eexpiration \\u003E $old_timestamp) {\\r\\n      $old_timestamp = $old_expiration-\\u003Eexpiration;\\r\\n    }\\r\\n  }\\r\\n\\r\\n  \\/\\/ determine how much time was left on the old role\\r\\n  $time_left = $old_timestamp - $curtime;\\r\\n  \\/\\/ add it to the new role\\r\\n  $new_timestamp = $expiration-\\u003Eexpiration + $time_left;\\r\\n  \\/\\/ write it to the expiration object and save to the DB.\\r\\n  $expiration-\\u003Eexpiration = $new_timestamp;\\r\\n  db_query(\\u0022UPDATE {uc_roles_expirations} SET expiration = %d WHERE uid = %d and rid = %d\\u0022, $new_timestamp, $order-\\u003Euid, $expiration-\\u003Erid);\\r\\n\\r\\n  \\/\\/ Delete the old expiration table entry without going through revoke (don\\u0027t want to trigger rules for it.)\\r\\n  $user = user_load($order-\\u003Euid);\\r\\n  uc_roles_delete($user, 13, TRUE);\\r\\n" } },
+        { "php_eval" : { "code" : "  $curtime = time();\\r\\n  $old_timestamp = $curtime;\\r\\n  $old_expirations = db_query(\\u0022SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid AND rid = 13\\u0022, array(\\u0027:uid\\u0027 =\\u003E $order-\\u003Euid));\\r\\n  foreach ($old_expirations as $old_expiration)\\r\\n  {\\r\\n    \\/\\/ there should really only be one entry, but for the benefit of the doubt,\\r\\n    \\/\\/ use the one with the greatest timestamp\\r\\n    if ($old_expiration-\\u003Eexpiration \\u003E $old_timestamp) {\\r\\n      $old_timestamp = $old_expiration-\\u003Eexpiration;\\r\\n    }\\r\\n  }\\r\\n\\r\\n  \\/\\/ determine how much time was left on the old role\\r\\n  $time_left = $old_timestamp - $curtime;\\r\\n  \\/\\/ add it to the new role\\r\\n  $new_timestamp = $expiration-\\u003Eexpiration + $time_left;\\r\\n  \\/\\/ write it to the expiration object and save to the DB.\\r\\n  $expiration-\\u003Eexpiration = $new_timestamp;\\r\\n  db_query(\\u0022UPDATE {uc_roles_expirations} SET expiration = :expiration WHERE uid = :uid and rid = :rid\\u0022, array(\\u0027:expiration\\u0027 =\\u003E $new_timestamp, \\u0027:uid\\u0027 =\\u003E $order-\\u003Euid, \\u0027:rid\\u0027 =\\u003E$expiration-\\u003Erid));\\r\\n\\r\\n  \\/\\/ Delete the old expiration table entry without going through revoke (don\\u0027t want to trigger rules for it.)\\r\\n  $user = user_load($order-\\u003Euid);\\r\\n  uc_roles_delete($user, 13, TRUE);\\r\\n" } },
         { "user_remove_role" : {
             "account" : [ "order:customer" ],
             "roles" : { "value" : { "13" : "13" } }
@@ -494,7 +611,7 @@ function bdw_role_rules_feature_default_rules_configuration() {
         }
       ],
       "DO" : [
-        { "php_eval" : { "code" : "  $curtime = time();\\r\\n  $old_timestamp = $curtime;\\r\\n  $old_expirations = db_query(\\u0022SELECT expiration FROM {uc_roles_expirations} WHERE uid = %d AND rid = 8\\u0022, $order-\\u003Euid);\\r\\n  while ($old_expiration = db_fetch_object($old_expirations))\\r\\n  {\\r\\n    \\/\\/ there should really only be one entry, but for the benefit of the doubt,\\r\\n    \\/\\/ use the one with the greatest timestamp\\r\\n    if ($old_expiration-\\u003Eexpiration \\u003E $old_timestamp) {\\r\\n      $old_timestamp = $old_expiration-\\u003Eexpiration;\\r\\n    }\\r\\n  }\\r\\n\\r\\n  \\/\\/ determine how much time was left on the old role\\r\\n  $time_left = $old_timestamp - $curtime;\\r\\n  \\/\\/ add it to the new role\\r\\n  $new_timestamp = $expiration-\\u003Eexpiration + $time_left;\\r\\n  \\/\\/ write it to the expiration object and save to the DB.\\r\\n  $expiration-\\u003Eexpiration = $new_timestamp;\\r\\n  db_query(\\u0022UPDATE {uc_roles_expirations} SET expiration = %d WHERE uid = %d and rid = %d\\u0022, $new_timestamp, $order-\\u003Euid, $expiration-\\u003Erid);\\r\\n\\r\\n  \\/\\/ Delete the old expiration table entry without going through revoke (don\\u0027t want to trigger rules for it.)\\r\\n  $user = user_load($order-\\u003Euid);\\r\\n  uc_roles_delete($user, 8, TRUE);\\r\\n" } },
+        { "php_eval" : { "code" : "  $curtime = time();\\r\\n  $old_timestamp = $curtime;\\r\\n  $old_expirations = db_query(\\u0022SELECT expiration FROM {uc_roles_expirations} WHERE uid = :uid AND rid = 8\\u0022, array(\\u0027:uid\\u0027 =\\u003E $order-\\u003Euid));\\r\\n  foreach ($old_expirations as $old_expiration)\\r\\n  {\\r\\n    \\/\\/ there should really only be one entry, but for the benefit of the doubt,\\r\\n    \\/\\/ use the one with the greatest timestamp\\r\\n    if ($old_expiration-\\u003Eexpiration \\u003E $old_timestamp) {\\r\\n      $old_timestamp = $old_expiration-\\u003Eexpiration;\\r\\n    }\\r\\n  }\\r\\n\\r\\n  \\/\\/ determine how much time was left on the old role\\r\\n  $time_left = $old_timestamp - $curtime;\\r\\n  \\/\\/ add it to the new role\\r\\n  $new_timestamp = $expiration-\\u003Eexpiration + $time_left;\\r\\n  \\/\\/ write it to the expiration object and save to the DB.\\r\\n  $expiration-\\u003Eexpiration = $new_timestamp;\\r\\n  db_query(\\u0022UPDATE {uc_roles_expirations} SET expiration = :expiration WHERE uid = :uid and rid = :rid\\u0022, \\r\\n    array(\\u0027:expiration\\u0027 =\\u003E $new_timestamp, \\u0027:uid\\u0027 =\\u003E $order-\\u003Euid, \\u0027:rid\\u0027 =\\u003E $expiration-\\u003Erid));\\r\\n\\r\\n  \\/\\/ Delete the old expiration table entry without going through revoke (don\\u0027t want to trigger rules for it.)\\r\\n  $user = user_load($order-\\u003Euid);\\r\\n  uc_roles_delete($user, 8, TRUE);\\r\\n" } },
         { "user_remove_role" : {
             "account" : [ "order:customer" ],
             "roles" : { "value" : { "8" : "8" } }
