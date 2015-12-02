@@ -74,10 +74,28 @@ function bdw_role_rules_feature_theme_registry_alter(&$theme_registry)
 }
 
 function bdw_role_rules_feature_theme_uc_cart_complete_sale($variables) {
+
+ // message is set assuming a purchase of a membership, set correctly depending on whether they are a new member or renewing from an existing account
+  $memb_message = $variables['message'];
+  $variables['message'] = ''; // empty it for now
+
   foreach ($variables['order']->products as $product)
   {
-    if (preg_match("/^FullMembership-BDA-.*/", $product->model)) {
-      $variables['message'] .= t('<p>Because you have purchased a discounted membership that requires you provide a boondocking location, you must ensure that you have a valid one entered under the Boondocking Available tab of your account settings. Your membership will not be fully activated until you do.');
+    if ($product->data['type'] == 'membership_level')
+    { 
+      // add back the membership purchase message
+      $variables['message'] .= $memb_message;
+      if (preg_match("/^FullMembership-BDA-.*/", $product->model)) {
+        // add details about host memberships
+        $variables['message'] .= t('<p>Because you have purchased a host membership that requires you provide a boondocking location, you must ensure that you have a valid one entered under the Boondocking Available tab of your account settings. Your membership will not be fully activated until you do.');
+      }
+    }
+    else
+    {
+      // Then we have a regular product - probably a gift certificate
+      if (preg_match("/^GiftMembership.*/", $product->model)) {
+        $variables['message'] .= t('<p>Thank you for purchasing a gift membership to Boondockers Welcome. You will receive an email with the code(s) that you can print or forward on to your recipients.</p>');
+      }
     }
   }
   return $variables['message'];
