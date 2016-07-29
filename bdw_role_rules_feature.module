@@ -142,3 +142,13 @@ function bdw_role_rules_feature_default_rules_configuration_alter(&$configs) {
   }
 }
 
+function bdw_role_rules_feature_userpoints_role_extended($uid, $rid, $txn_id, $expiry, $new_expiry, $tid) {
+  $flag = flag_get_flag('membership_expiring');
+  if ($flag && $flag->is_flagged($uid)) {
+    // user is marked as expiring, undo that
+    // even if the new expiry is still in the "expiring" window, the
+    // 'notified' flag will have been reset, and the cron job will re-set the
+    // expiring flag again.
+    $flag->flag('unflag', $uid);
+  }
+}
