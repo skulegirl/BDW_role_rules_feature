@@ -42,20 +42,22 @@ function bdw_role_rules_feature_mail_alter(&$message) {
   else if ($message['id'] == 'user_register_no_approval_required')
   {
     $account = $message['params']['account'];
-    $order = $message['params']['order'];
-    $send_account_details = FALSE;
-    foreach($order->products as $product) {
-      if ($product->data['type'] == 'membership_level') {
-        // we're creating an account, so we do need to send account details
-        $send_account_details = TRUE;
-        break;
+    if (isset($message['params']['order'])) {
+      $order = $message['params']['order'];
+      $send_account_details = FALSE;
+      foreach($order->products as $product) {
+        if ($product->data['type'] == 'membership_level') {
+          // we're creating an account, so we do need to send account details
+          $send_account_details = TRUE;
+          break;
+        }
+      }
+      if (!$send_account_details) {
+        $message['send'] = FALSE;
+        return;
       }
     }
-    if (!$send_account_details) {
-      $message['send'] = FALSE;
-      return;
-    }
-    
+
     $message['body'][0] = t('!username,', array('!username' => $account->name));
     $message['body'][] = t('Thank you for joining Boondockers Welcome. You may now log in to !login_uri using the following username and password:', 
       array('!login_uri' => url('user', array('absolute' => TRUE, 'language' => $message['language']))));
